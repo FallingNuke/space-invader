@@ -1,41 +1,53 @@
-input.onButtonPressed(Button.A, function on_button_pressed_a() {
+// by Mark Shapiro
+input.onButtonPressed(Button.A, function () {
     player.move(1)
 })
-input.onButtonPressed(Button.AB, function on_button_pressed_ab() {
-    
-    shoot = game.createSprite(player.get(LedSpriteProperty.X), player.get(LedSpriteProperty.Y))
+input.onButtonPressed(Button.AB, function () {
+    Bullet = game.createSprite(player.get(LedSpriteProperty.X), player.get(LedSpriteProperty.Y))
     for (let index = 0; index < 4; index++) {
-        shoot.change(LedSpriteProperty.Y, -1)
+        Bullet.change(LedSpriteProperty.Y, -1)
         basic.pause(10)
-        if (Enemy.isTouching(shoot)) {
+        if (Enemy.isTouching(Bullet)) {
             Enemy.delete()
             game.addScore(1)
         }
-        
     }
-    shoot.delete()
+    Bullet.delete()
 })
-input.onButtonPressed(Button.B, function on_button_pressed_b() {
+input.onButtonPressed(Button.B, function () {
     player.move(-1)
 })
-let Enemy : game.LedSprite = null
-let shoot : game.LedSprite = null
-let player : game.LedSprite = null
-player = game.createSprite(2, 4)
-basic.forever(function on_forever() {
+function Live () {
+    Lives = 1
     if (Enemy.isTouching(player)) {
-        player.delete()
-        game.gameOver()
+        Lives += -1
+        if (Lives < 1) {
+            game.gameOver()
+        }
     }
-    
-})
-basic.forever(function on_forever2() {
-    
+    if (Enemy.isTouching(Bullet)) {
+        Lives += 0.25
+    }
+}
+let Lives = 0
+let Enemy: game.LedSprite = null
+let Bullet: game.LedSprite = null
+let player: game.LedSprite = null
+player = game.createSprite(2, 4)
+basic.forever(function () {
     Enemy = game.createSprite(randint(0, 4), 0)
-    for (let index2 = 0; index2 < 4; index2++) {
+    for (let index = 0; index < 4; index++) {
         Enemy.change(LedSpriteProperty.Y, 1)
         basic.pause(500)
     }
     basic.pause(10)
     Enemy.delete()
+})
+basic.forever(function () {
+    if (Enemy.isTouching(player)) {
+        player.delete()
+        basic.showNumber(game.score())
+        basic.pause(500)
+        game.gameOver()
+    }
 })
